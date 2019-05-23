@@ -12,9 +12,9 @@ class Square extends React.Component {
     render() {
         return (
             <button className="square"
-            onClick={() => this.setState({value: 'X'})}
+            onClick={() => this.props.onClick()}
             >
-                {this.state.value}
+                {this.props.value}
             </button>
         );
     }
@@ -25,7 +25,20 @@ class Board extends React.Component {
         super(props);
         this.state = {
             squares: Array(9).fill(null),
+            nextMark: 'X'
         };
+    }
+    handleClick(i){
+        const squares = this.state.squares.slice();
+        if (squares[i] === null){
+            squares[i] = this.state.nextMark;
+            if(this.state.nextMark === 'X'){
+                this.setState({nextMark:'O'});
+            } else{
+                this.setState({nextMark:'X'});
+            }
+        }
+        this.setState({squares: squares});
     }
     renderSquare(i) {
         return (
@@ -37,7 +50,7 @@ class Board extends React.Component {
     }
 
     render() {
-        const status = 'Next player: Y';
+        const status = 'Next player: '.concat(this.state.nextMark);
         return (
             <div>
                 <div className="status">{status}</div>

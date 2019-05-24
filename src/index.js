@@ -1,6 +1,25 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import styles from './index.css';
+function calculateWinner(squares) {
+    const lines = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+    for (let i = 0; i < lines.length; i++) {
+      const [a, b, c] = lines[i];
+      if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+        return squares[a];
+      }
+    }
+    return null;
+  }
 
 class Square extends React.Component {
     constructor(props) {
@@ -19,7 +38,18 @@ class Square extends React.Component {
         );
     }
 }
-
+class Button extends React.Component{
+    constructor(props){
+        super(props);
+    }
+    render(){
+        return (
+            <div>
+                <button onClick= {() => this.props.onClick()}>Reiniciar</button>
+            </div>
+        );
+    }
+}
 class Board extends React.Component {
     constructor(props){
         super(props);
@@ -28,8 +58,16 @@ class Board extends React.Component {
             nextMark: 'X'
         };
     }
+    handleButtonClick(){
+        this.setState({
+            squares: Array(9).fill(null)
+        });
+    }
     handleClick(i){
         const squares = this.state.squares.slice();
+        if (calculateWinner(squares)||squares[i]){
+            return;
+        }
         if (squares[i] === null){
             squares[i] = this.state.nextMark;
             if(this.state.nextMark === 'X'){
@@ -48,9 +86,17 @@ class Board extends React.Component {
         />
         );
     }
+    
 
     render() {
-        const status = 'Next player: '.concat(this.state.nextMark);
+        const winner = calculateWinner(this.state.squares);
+        const button = winner ? <Button onClick={() => this.handleButtonClick()}/>: ''
+        let status;
+        if (winner){
+            status = 'Winner: ' + winner;
+        } else{
+            status = 'Next player: '.concat(this.state.nextMark);
+        }
         return (
             <div>
                 <div className="status">{status}</div>
@@ -69,11 +115,11 @@ class Board extends React.Component {
                     {this.renderSquare(7)}
                     {this.renderSquare(8)}
                 </div>
+                {button}
             </div>
         );
     }
 }
-
 class Game extends React.Component {
     render() {
         return (

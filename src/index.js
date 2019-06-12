@@ -1,6 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import styles from './index.css';
+import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
+import Card from '@material-ui/core/Card';
+import Typography from '@material-ui/core/Typography';
+import 'typeface-roboto';
 function calculateWinner(squares) {
     const lines = [
       [0, 1, 2],
@@ -12,15 +17,24 @@ function calculateWinner(squares) {
       [0, 4, 8],
       [2, 4, 6],
     ];
+    console.dir(squares)
     for (let i = 0; i < lines.length; i++) {
       const [a, b, c] = lines[i];
       if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
         return squares[a];
       }
     }
+    // if(!(indexOf(null))){
+    //     alert("DEU VELHA!")
+    // }
     return null;
   }
-
+function isDraw(squares){
+    if (!(squares.indexOf(null) in squares)){
+        return true;
+    }
+    return false;
+}
 class Square extends React.Component {
     constructor(props) {
         super(props);
@@ -30,23 +44,11 @@ class Square extends React.Component {
     }
     render() {
         return (
-            <button className="square"
+            <Button variant="outlined" className="square"
             onClick={() => this.props.onClick()}
             >
                 {this.props.value}
-            </button>
-        );
-    }
-}
-class Button extends React.Component{
-    constructor(props){
-        super(props);
-    }
-    render(){
-        return (
-            <div>
-                <button onClick= {() => this.props.onClick()}>Reiniciar</button>
-            </div>
+            </Button>
         );
     }
 }
@@ -90,34 +92,40 @@ class Board extends React.Component {
 
     render() {
         const winner = calculateWinner(this.state.squares);
-        const button = winner ? <Button onClick={() => this.handleButtonClick()}/>: ''
+        const button = winner || isDraw(this.state.squares) ? <Button variant="contained" color="primary" onClick={() => this.handleButtonClick()}>Reiniciar</Button>: ''
         let status;
         if (winner){
-            status = 'Winner: ' + winner;
-        } else{
-            status = 'Next player: '.concat(this.state.nextMark);
+            status = 'Ganhador: ' + winner;
+        } else if(isDraw(this.state.squares)){
+            status = 'Não há ganhadores. Reinicie o jogo!';
+        }
+        else{
+            status = 'Próximo jogador: '.concat(this.state.nextMark);
         }
         return (
-            <div>
-                <div className="status">{status}</div>
-                <div className="board-row">
+            <Grid container>
+                <Grid item xs={12}>
+                    <Typography variant="h5" gutterBottom>{status}</Typography>
+                </Grid>
+                <Grid item xs={12}>
                     {this.renderSquare(0)}
                     {this.renderSquare(1)}
                     {this.renderSquare(2)}
-                </div>
-                <div className="board-row">
-                    {this.renderSquare(3)}
-                    {this.renderSquare(4)}
-                    {this.renderSquare(5)}
-                </div>
-                <div className="board-row">
+                </Grid>
+                <Grid item xs={12}>
+                     {this.renderSquare(3)}
+                     {this.renderSquare(4)}
+                     {this.renderSquare(5)}
+                </Grid>
+                <Grid item xs={12}>
                     {this.renderSquare(6)}
                     {this.renderSquare(7)}
                     {this.renderSquare(8)}
-                </div>
+                </Grid>
                 {button}
-            </div>
+            </Grid>
         );
+        
     }
 }
 class Game extends React.Component {

@@ -40,12 +40,12 @@ body {
     background: #ddd;
   }
   
-  .game {
-    display: flex;
-    flex-direction: row;
-  }
   
   .game-info {
     margin-left: 20px;
+  }
+
+  .card {
+    min-width: 275,
   }
   

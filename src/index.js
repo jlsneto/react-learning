@@ -17,16 +17,12 @@ function calculateWinner(squares) {
       [0, 4, 8],
       [2, 4, 6],
     ];
-    console.dir(squares)
     for (let i = 0; i < lines.length; i++) {
       const [a, b, c] = lines[i];
       if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
         return squares[a];
       }
     }
-    // if(!(indexOf(null))){
-    //     alert("DEU VELHA!")
-    // }
     return null;
   }
 function isDraw(squares){
@@ -61,6 +57,7 @@ class Board extends React.Component {
         };
     }
     handleButtonClick(){
+        this.props.onWinner(calculateWinner(this.state.squares))
         this.setState({
             squares: Array(9).fill(null)
         });
@@ -96,6 +93,7 @@ class Board extends React.Component {
         let status;
         if (winner){
             status = 'Ganhador: ' + winner;
+            
         } else if(isDraw(this.state.squares)){
             status = 'Não há ganhadores. Reinicie o jogo!';
         }
@@ -122,25 +120,62 @@ class Board extends React.Component {
                     {this.renderSquare(7)}
                     {this.renderSquare(8)}
                 </Grid>
+                <Grid item>
                 {button}
+                </Grid>
             </Grid>
         );
         
     }
 }
+
+class Player{
+    constructor(name, mark){
+        this.name = name;
+        this.mark = mark
+        this.score = 0
+    }
+    onWinner(){
+        this.score += 1
+        return this
+    }
+}
 class Game extends React.Component {
+    constructor(props){
+        super(props)
+        const player1 = new Player('Playername', 'X')
+        const player2 = new Player('Playername', 'O')
+        this.state = {
+            players: [player1,player2]
+        }
+    }
+    renderPlayers(){
+        return (this.state.players.map((player) => {
+            return <Typography variant="h6" gutterBottom>{player.name} {player.mark} : {player.score}</Typography>
+        }))
+    }
     render() {
         return (
             <div className="game">
                 <div className="game-board">
-                    <Board />
+                    <Board onWinner={(e) => this.onWinner(e)}></Board>
                 </div>
-                <div className="game-info">
-                    <div>{/* status */}</div>
-                    <ol>{/* TODO */}</ol>
-                </div>
+                <Grid container>
+                    <Grid item xs={12}>
+                    {this.renderPlayers()}
+                    </Grid>
+                </Grid>
             </div>
         );
+    }
+    onWinner(winner){
+        const n = this.state.players.map((e,i)=>{
+            if(e.mark === winner){
+                e.onWinner()
+            }
+            return e
+        })
+        this.setState({players:n})
     }
 }
 

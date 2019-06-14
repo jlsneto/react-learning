@@ -32,15 +32,17 @@ function isDraw(squares){
     return false;
 }
 class Square extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            value: null,
-        };
-    }
     render() {
+        const {value} = this.props;
+        let color = "default"
+        let variant = 'contained'
+        if(value === 'X'){
+            color = 'secondary' 
+        }else if(value === 'O'){
+            color = 'primary'
+        }
         return (
-            <Button variant="outlined" className="square"
+            <Button variant={color!=='default' ? variant:"outlined"}className="square" color={color ? color:"default"}
             onClick={() => this.props.onClick()}
             >
                 {this.props.value}
@@ -53,7 +55,8 @@ class Board extends React.Component {
         super(props);
         this.state = {
             squares: Array(9).fill(null),
-            nextMark: 'X'
+            nextMark: 'X',
+            squareColor: null
         };
     }
     handleButtonClick(){
@@ -81,6 +84,7 @@ class Board extends React.Component {
         return (
         <Square
         value = {this.state.squares[i]}
+        color = {this.state.squareColor}
         onClick = {() => this.handleClick(i)}
         />
         );

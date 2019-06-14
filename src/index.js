@@ -4,8 +4,14 @@ import styles from './index.css';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
 import Typography from '@material-ui/core/Typography';
 import 'typeface-roboto';
+
 function calculateWinner(squares) {
     const lines = [
       [0, 1, 2],
@@ -31,6 +37,50 @@ function isDraw(squares){
     }
     return false;
 }
+
+class AlertDialog extends React.Component {
+    constructor(props){
+        super(props)
+        this.state = {
+            open: true,
+          };
+    }
+  
+    handleClickOpen(){
+      this.setState({ open: true });
+    };
+  
+    handleClose(){
+      this.setState({ open: false });
+    };
+  
+    render() {
+      return (
+        <div>
+          <Dialog
+            open={this.state.open}
+            onClose={() => this.handleClose()}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">{"Fim de Partida"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                  {this.props.status}
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+            {this.props.buttonReload}
+            <Button onClick={() =>this.handleClose()} color="primary">
+              Visualizar
+            </Button>
+            </DialogActions>
+          </Dialog>
+        </div>
+      );
+    }
+  }
+
 class Square extends React.Component {
     render() {
         const {value} = this.props;
@@ -42,8 +92,9 @@ class Square extends React.Component {
             color = 'primary'
         }
         return (
-            <Button variant={color!=='default' ? variant:"outlined"}className="square" color={color ? color:"default"}
+            <Button variant={color!=='default' ? variant:"outlined"} className="square" color={color ? color:"default"}
             onClick={() => this.props.onClick()}
+            style={{margin:5}}
             >
                 {this.props.value}
             </Button>
@@ -92,40 +143,45 @@ class Board extends React.Component {
     
 
     render() {
+        let nextMarkMsg;
         const winner = calculateWinner(this.state.squares);
-        const button = winner || isDraw(this.state.squares) ? <Button variant="contained" color="primary" onClick={() => this.handleButtonClick()}>Reiniciar</Button>: ''
+        const buttonReload = winner ? <Button color="primary" autoFocus style={{float:"right", marginLeft:"28%"}} onClick={() => this.handleButtonClick()}>Reiniciar</Button>: '';
         let status;
         if (winner){
-            status = 'Ganhador: ' + winner;
-            
+            status = `Parabéns jogador ${winner}. Vamos para a próxima partida! (:`;
         } else if(isDraw(this.state.squares)){
-            status = 'Não há ganhadores. Reinicie o jogo!';
+            status = 'Aaaah não. DEU VELHA! :( ... Mas não desanimem e vamos para a próxima partida!';
         }
         else{
-            status = 'Próximo jogador: '.concat(this.state.nextMark);
+            nextMarkMsg = 'Quem joga: '.concat(this.state.nextMark);
         }
+        const dialog = winner || isDraw(this.state.squares) ? <AlertDialog status={status} buttonReload={buttonReload}></AlertDialog>: null
         return (
-            <Grid container>
-                <Grid item xs={12}>
-                    <Typography variant="h5" gutterBottom>{status}</Typography>
+            <Grid style={{minWidth:255}}>
+                <Grid item>
+                    <Typography variant="h5" gutterBottom style={{marginTop:20, marginLeft:"20%"}}>{nextMarkMsg}</Typography>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item>
                     {this.renderSquare(0)}
                     {this.renderSquare(1)}
                     {this.renderSquare(2)}
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item>
                      {this.renderSquare(3)}
                      {this.renderSquare(4)}
                      {this.renderSquare(5)}
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item>
                     {this.renderSquare(6)}
                     {this.renderSquare(7)}
                     {this.renderSquare(8)}
                 </Grid>
+                {this.props.renderPlayers()}
                 <Grid item>
-                {button}
+                    {buttonReload}
+                </Grid>
+                <Grid item>
+                    {dialog}
                 </Grid>
             </Grid>
         );
@@ -155,21 +211,18 @@ class Game extends React.Component {
     }
     renderPlayers(){
         return (this.state.players.map((player) => {
-            return <Typography variant="h6" gutterBottom>{player.name} {player.mark} : {player.score}</Typography>
+            return <Grid item><Typography variant="caption" gutterBottom>{player.name} {player.mark} : {player.score} </Typography></Grid>
         }))
     }
     render() {
         return (
-            <div className="game">
+            <Card>
+            <div className="container">
                 <div className="game-board">
-                    <Board onWinner={(e) => this.onWinner(e)}></Board>
+                    <Board renderPlayers={() => this.renderPlayers()} onWinner={(e) => this.onWinner(e)}></Board>
                 </div>
-                <Grid container>
-                    <Grid item xs={12}>
-                    {this.renderPlayers()}
-                    </Grid>
-                </Grid>
             </div>
+            </Card>
         );
     }
     onWinner(winner){

@@ -143,23 +143,25 @@ class Board extends React.Component {
     
 
     render() {
-        let nextMarkMsg;
+        let headerMessage;
         const winner = calculateWinner(this.state.squares);
-        const buttonReload = winner ? <Button color="primary" autoFocus style={{float:"right", marginLeft:"28%"}} onClick={() => this.handleButtonClick()}>Reiniciar</Button>: '';
-        let status;
+        const buttonReload = <Button color="primary" autoFocus style={{float:"right", marginLeft:"28%"}} onClick={() => this.handleButtonClick()}>Limpar campo</Button>
+        let status = "Fim da partida";
         if (winner){
-            status = `Parabéns jogador ${winner}. Vamos para a próxima partida! (:`;
+            status = `Parabéns jogador ${winner}. Vamos para a próxima rodada! (:`;
+            headerMessage = "Temos um Vencedor!"
         } else if(isDraw(this.state.squares)){
-            status = 'Aaaah não. DEU VELHA! :( ... Mas não desanimem e vamos para a próxima partida!';
+            status = 'Aaaah não. DEU VELHA! :( ... Mas não desanimem e vamos para a próxima rodada!';
+            headerMessage = "Deu Velha!"
         }
         else{
-            nextMarkMsg = 'Quem joga: '.concat(this.state.nextMark);
+            headerMessage = 'Quem joga: '.concat(this.state.nextMark);
         }
         const dialog = winner || isDraw(this.state.squares) ? <AlertDialog status={status} buttonReload={buttonReload}></AlertDialog>: null
         return (
             <Grid style={{minWidth:255}}>
                 <Grid item>
-                    <Typography variant="h5" gutterBottom style={{marginTop:20, marginLeft:"20%"}}>{nextMarkMsg}</Typography>
+                    <Typography variant="h5" gutterBottom style={{marginTop:20, marginLeft:"20%"}}>{headerMessage}</Typography>
                 </Grid>
                 <Grid item>
                     {this.renderSquare(0)}
